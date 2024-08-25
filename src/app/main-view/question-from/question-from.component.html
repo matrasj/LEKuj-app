@@ -1,0 +1,39 @@
+<div>
+  <h1>{{ 'Dodaj pytanie do kategorii: (' + categoryName + ')' }}</h1>
+
+  <ng-container *ngIf="!isLoading; else loader">
+    <div class="row mb-3">
+      <mat-form-field class="full-width">
+        <mat-label>Treść pytania</mat-label>
+        <textarea [formControl]="contentControl" matInput placeholder="Wpisz treśc pytania..."></textarea>
+      </mat-form-field>
+    </div>
+
+    <div class="answer" *ngFor="let answer of answers; let index = index">
+      <div class="d-flex align-items-center">
+        <mat-checkbox [formControl]="answer.correctControl" class="me-3">Poprawna</mat-checkbox>
+
+        <mat-form-field class="full-width">
+          <mat-label>{{ 'Odpowiedź ' + (index | numberToLetter) }}</mat-label>
+          <textarea matInput [formControl]="answer.contentControl" [placeholder]="'Wpisz treśc odpowiedzi ' + (index | numberToLetter) + '...'"></textarea>
+        </mat-form-field>
+
+        <mat-icon class="cursor-pointer" (click)="deleteAnswer(index)">delete</mat-icon>
+      </div>
+    </div>
+    <div class="w-100 d-flex justify-content-end">
+      <button class="lek-button-primary" (click)="addNewAnswer()">Dodaj następną odpowiedź</button>
+    </div>
+
+    <div class="d-flex align-items-center">
+      <button class="lek-button-outline-primary me-3" [routerLink]="RouterManager.getHome()">Wróć</button>
+      <button class="lek-button-primary" (click)="saveQuestion()">Zapisz pytanie</button>
+
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #loader>
+  <app-loader></app-loader>
+</ng-template>
+

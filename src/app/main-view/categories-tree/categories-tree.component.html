@@ -1,0 +1,37 @@
+<ng-container *ngIf="!isLoading; else loader">
+  <div>
+    <h1>Kategorie</h1>
+    <div
+      [ngStyle]="{ 'margin-left': (categoryQuery.level * 30) + 'px' }"
+      class="category-item d-flex align-items-center justify-content-between p-1 mb-2" *ngFor="let categoryQuery of categories">
+      <div class="d-flex align-items-center">
+        <ng-container *ngIf="!loadingCategoryIds.includes(categoryQuery.id); else loadingIcon">
+          <mat-icon *ngIf="categoryQuery.hasNestedCategories; else blockIcon" class="me-2 cursor-pointer"
+                    (click)="toggleCategory(categoryQuery.id)"
+          >{{ expandedCategoryIds.includes(categoryQuery.id) ? 'expand_less' : 'expand_more'}}</mat-icon>
+        </ng-container>
+        <p class="mb-0 ms-2">{{ categoryQuery | categoryPreview }}</p>
+      </div>
+
+      <div class="d-flex align-items-center" style="gap: 1rem">
+        <button class="lek-button-primary">Nauka</button>
+        <button class="lek-button-primary">Rozwiąż quiz</button>
+        <button class="lek-button-primary" [routerLink]="RouterManager.getQuestionForm(categoryQuery.id)"
+                [queryParams]="{ categoryName: categoryQuery.name }">Dodaj pytanie</button>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+
+<ng-template #loadingIcon>
+  <app-spinner></app-spinner>
+</ng-template>
+
+<ng-template #blockIcon>
+  <mat-icon>block</mat-icon>
+</ng-template>
+
+<ng-template #loader>
+  <app-loader></app-loader>
+</ng-template>
