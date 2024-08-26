@@ -6,6 +6,7 @@ import {QuestionFromComponent} from "./main-view/question-from/question-from.com
 const routes: Routes = [
   { path: '', component: CategoriesTreeComponent },
   { path: 'question-form/:categoryId', component: QuestionFromComponent },
+  { path: 'question-form/:categoryId/edit/:questionId', component: QuestionFromComponent },
   { path: '**', redirectTo: '' }
 ];
 

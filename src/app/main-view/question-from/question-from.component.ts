@@ -7,6 +7,7 @@ import {RouteManager} from "../../infrastructure/route-manager";
 import {QuestionCommand} from "../../model/question/question-command";
 import {AnswerCommand} from "../../model/answer/answer-command";
 import {QuestionService} from "../../service/question.service";
+import {QuestionQuery} from "../../model/question/question-query";
 
 interface Answer {
   contentControl: FormControl;
@@ -21,6 +22,7 @@ export class QuestionFromComponent implements OnInit {
   public readonly RouterManager = RouteManager;
   public isLoading: boolean = false;
   public categoryId: number | null = null;
+  public questionId: number | null = null;
   public categoryName: string | null = null;
   public contentControl: FormControl = new FormControl(null, [Validators.required])
   public answers: Answer[] = [];
@@ -35,7 +37,18 @@ export class QuestionFromComponent implements OnInit {
       this.activatedRoute.queryParamMap
     ]).subscribe(([params, queryParams]) => {
       this.categoryId = Number(params.get('categoryId'));
+      this.questionId = Number(params.get('questionId'));
       this.categoryName = queryParams.get('categoryName');
+
+      if (this.questionId) {
+        this.isLoading = true;
+        this.questionService.getById(this.questionId)
+          .pipe(finalize(() => this.isLoading = false))
+          .subscribe({
+            next: (res) => this.fillEditValues(res),
+            error: (err) => this.toastr.error('Wystąpił błąd podczas pobierania danych do tego pytania')
+          })
+      }
     });
   }
 
@@ -70,12 +83,11 @@ export class QuestionFromComponent implements OnInit {
         },
         error: (err) => this.toastr.error('Wystąpił błąd podczas tworzenia pytania dla kategorii: ' + this.categoryName)
       });
-
   }
 
   private get questionCommand(): QuestionCommand {
     return {
-      questionId: 1,
+      questionId: this.questionId,
       content: this.contentControl.value,
       categoryId: this.categoryId,
       answers: this.answers.map(answerControl => {
@@ -85,5 +97,13 @@ export class QuestionFromComponent implements OnInit {
         } as AnswerCommand;
       })
     } as QuestionCommand;
+  }
+
+  private fillEditValues(questionQuery: QuestionQuery): void {
+    this.contentControl.setValue(questionQuery.content);
+    questionQuery.answers.forEach(answer => this.answers.push({
+      contentControl: new FormControl(answer.content, [Validators.required]),
+      correctControl: new FormControl(answer.correct)
+    } as Answer));
   }
 }
